@@ -31,7 +31,7 @@
  * @return {RegExp}
  */
 function getRegexForGuid() {
-   throw new Error('Not implemented');
+   return new RegExp(/^{[A-F0-9]{8}-([A-F0-9]{4}-){3}[A-F0-9]{12}}$/i)
 }
 
 
@@ -53,26 +53,7 @@ function getRegexForGuid() {
  *
  */
 function getRegexForPitSpot() {
-   throw new Error('Not implemented');
-}
-
-
-/**
- * Returns the regexp that matches all IPv4 strings in
- * 'XX.XX.XX.XX' dotted format where XX is number 0 to 255
- *
- * Valid IPv4:                       Invalid IPv4
- * ---------------                  -----------------
- * '0.0.0.0'                         '300.0.0.0'
- * '127.0.0.1'                       '127.0.0.-1'
- * '10.10.1.1'                       '23.24.25.26.27'
- * '46.61.155.237'                   'Set dns to 8.8.8.8'
- * '010.234.015.001'
- *
- * @return {RegExp}
- */
-function getRegexForIPv4() {
-   throw new Error('Not implemented');
+   return new RegExp(/p.t/)
 }
 
 
@@ -91,39 +72,12 @@ function getRegexForIPv4() {
  * @return {RegExp}
  */
 function getRegexForSSN() {
-   throw new Error('Not implemented');
-}
-
-
-/**
- * Returns the password validator regex.
- * Regex will validate a password to make sure it meets the follwing criteria:
- *  - At least specified characters long (argument minLength)
- *  - Contains a lowercase letter
- *  - Contains an uppercase letter
- *  - Contains a number
- *  - Valid passwords will only be alphanumeric characters.
- *
- * @param {number} minLength
- * @return {Regex}
- *
- * @example
- *   let validator = getPasswordValidator(6);
- *   'password'.match(validator)  => false
- *   'Pa55Word'.match(validator)  => true
- *   'PASSw0rd'.match(validator)  => true
- *   'PASSW0RD'.match(validator)  => false
- *   'Pa55'.match(validator) => false
- */
-function getPasswordValidator(minLength) {
-   throw new Error('Not implemented');
+   return /^(?!000)\d{3}-(?!00)\d{2}-(?!0{4})\d{4}$/;
 }
 
 
 module.exports = {
     getRegexForGuid: getRegexForGuid,
     getRegexForPitSpot: getRegexForPitSpot,
-    getRegexForIPv4: getRegexForIPv4,
     getRegexForSSN: getRegexForSSN,
-    getPasswordValidator: getPasswordValidator
 };
