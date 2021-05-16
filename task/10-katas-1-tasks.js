@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
  * Returns the array of 32 compass points and heading.
@@ -17,48 +17,21 @@
  *  ]
  */
 function createCompassPoints() {
-    throw new Error('Not implemented');
-    var sides = ['N','E','S','W'];  // use array of cardinal directions only!
+  const sides = ['N', 'E', 'S', 'W']  // use array of cardinal directions only!
+
+  const byChar = (str) => str.split('')
+  const buildSideName = (chars) => chars.reduce((p, c) => p + (c === 'b' ? c : sides[+c]), '')
+
+  return [
+    '0', '0b1', '001', '01b0', '01', '01b1', '101', '1b0',
+    '1', '1b2', '121', '21b1', '21', '21b2', '221', '2b1',
+    '2', '2b3', '223', '23b2', '23', '23b3', '323', '3b2',
+    '3', '3b0', '303', '03b3', '03', '03b0', '003', '0b3',
+  ]
+    .map(byChar)
+    .map(buildSideName)
+    .map((sideName, i) => ({ abbreviation: sideName, azimuth: (360.0 / 32) * i }))
 }
-
-
-/**
- * Expand the braces of the specified string.
- * See https://en.wikipedia.org/wiki/Bash_(Unix_shell)#Brace_expansion
- *
- * In the input string, balanced pairs of braces containing comma-separated substrings
- * represent alternations that specify multiple alternatives which are to appear at that position in the output.
- *
- * @param {string} str
- * @return {Iterable.<string>}
- *
- * NOTE: The order of output string does not matter.
- *
- * Example:
- *   '~/{Downloads,Pictures}/*.{jpg,gif,png}'  => '~/Downloads/*.jpg',
- *                                                '~/Downloads/*.gif'
- *                                                '~/Downloads/*.png',
- *                                                '~/Pictures/*.jpg',
- *                                                '~/Pictures/*.gif',
- *                                                '~/Pictures/*.png'
- *
- *   'It{{em,alic}iz,erat}e{d,}, please.'  => 'Itemized, please.',
- *                                            'Itemize, please.',
- *                                            'Italicized, please.',
- *                                            'Italicize, please.',
- *                                            'Iterated, please.',
- *                                            'Iterate, please.'
- *
- *   'thumbnail.{png,jp{e,}g}'  => 'thumbnail.png'
- *                                 'thumbnail.jpeg'
- *                                 'thumbnail.jpg'
- *
- *   'nothing to do' => 'nothing to do'
- */
-function* expandBraces(str) {
-    throw new Error('Not implemented');
-}
-
 
 /**
  * Returns the ZigZag matrix
@@ -88,32 +61,63 @@ function* expandBraces(str) {
  *
  */
 function getZigZagMatrix(n) {
-    throw new Error('Not implemented');
-}
+  // diagonals :: n -> [[n]]
+  function diagonals(n) {
+    let diags = (xs, iCol, iRow) => {
+      if (iCol < xs.length) {
+        let xxs = splitAt(iCol, xs)
+
+        return [xxs[0]].concat(diags(
+          xxs[1],
+          iCol + (iRow < n ? 1 : -1),
+          iRow + 1,
+        ))
+      } else return [xs]
+    }
+
+    return diags(range(0, n * n - 1), 1, 1)
+  }
 
 
-/**
- * Returns true if specified subset of dominoes can be placed in a row accroding to the game rules.
- * Dominoes details see at: https://en.wikipedia.org/wiki/Dominoes
- *
- * Each domino tile presented as an array [x,y] of tile value.
- * For example, the subset [1, 1], [2, 2], [1, 2] can be arranged in a row (as [1, 1] followed by [1, 2] followed by [2, 2]),
- * while the subset [1, 1], [0, 3], [1, 4] can not be arranged in one row.
- * NOTE that as in usual dominoes playing any pair [i, j] can also be treated as [j, i].
- *
- * @params {array} dominoes
- * @return {bool}
- *
- * @example
- *
- * [[0,1],  [1,1]] => true
- * [[1,1], [2,2], [1,5], [5,6], [6,3]] => false
- * [[1,3], [2,3], [1,4], [2,4], [1,5], [2,5]]  => true
- * [[0,0], [0,1], [1,1], [0,2], [1,2], [2,2], [0,3], [1,3], [2,3], [3,3]] => false
- *
- */
-function canDominoesMakeRow(dominoes) {
-    throw new Error('Not implemented');
+  // Recursively read off n heads of diagonal lists
+  // rowsFromDiagonals :: n -> [[n]] -> [[n]]
+  function rowsFromDiagonals(n, lst) {
+    if (lst.length) {
+      let [edge, rest] = splitAt(n, lst)
+
+      return [edge.map(x => x[0])]
+        .concat(rowsFromDiagonals(n,
+          edge.filter(x => x.length > 1)
+            .map(x => x.slice(1))
+            .concat(rest),
+        ))
+    } else return []
+  }
+
+  // GENERIC FUNCTIONS
+
+  // splitAt :: Int -> [a] -> ([a],[a])
+  function splitAt(n, xs) {
+    return [xs.slice(0, n), xs.slice(n)]
+  }
+
+  // range :: From -> To -> Maybe Step -> [Int]
+  // range :: Int -> Int -> Maybe Int -> [Int]
+  function range(m, n, step) {
+    let d = (step || 1) * (n >= m ? 1 : -1)
+
+    return Array.from({
+      length: Math.floor((n - m) / d) + 1,
+    }, (_, i) => m + (i * d))
+  }
+
+  // ZIG-ZAG MATRIX
+
+  return rowsFromDiagonals(n,
+    diagonals(n)
+      .map((x, i) => (i % 2 || x.reverse()) && x),
+  )
+
 }
 
 
@@ -126,8 +130,8 @@ function canDominoesMakeRow(dominoes) {
  *     (The range includes all integers in the interval including both endpoints)
  *     The range syntax is to be used only for, and for every range that expands to more than two values.
  *
- * @params {array} nums
- * @return {bool}
+ * @params {Array.<number>} nums
+ * @return {string}
  *
  * @example
  *
@@ -137,13 +141,26 @@ function canDominoesMakeRow(dominoes) {
  * [ 1, 2, 4, 5]          => '1,2,4,5'
  */
 function extractRanges(nums) {
-    throw new Error('Not implemented');
+  let last = NaN
+
+  return nums
+    .reduce((p, c) => {
+      if (Math.abs(c) - last === 1) p[p.length - 1].push(c)
+      else p.push([c])
+
+      last = Math.abs(c)
+
+      return p
+    }, [])
+    .map(g => {
+      if (g.length > 2) return `${g[0]}-${g.pop()}`
+      return g.join(',')
+    })
+    .join(',')
 }
 
 module.exports = {
-    createCompassPoints : createCompassPoints,
-    expandBraces : expandBraces,
-    getZigZagMatrix : getZigZagMatrix,
-    canDominoesMakeRow : canDominoesMakeRow,
-    extractRanges : extractRanges
-};
+  createCompassPoints: createCompassPoints,
+  getZigZagMatrix: getZigZagMatrix,
+  extractRanges: extractRanges,
+}
