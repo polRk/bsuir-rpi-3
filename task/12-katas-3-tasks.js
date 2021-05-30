@@ -1,36 +1,5 @@
 'use strict'
 
-/**
- * Returns true if word occurrs in the specified word snaking puzzle.
- * Each words can be constructed using "snake" path inside a grid with top, left, right and bottom directions.
- * Each char can be used only once ("snake" should not cross itself).
- *
- * @param {array} puzzle
- * @param {array} searchStr
- * @return {bool}
- *
- * @example
- *   var puzzle = [
- *      'ANGULAR',
- *      'REDNCAE',
- *      'RFIDTCL',
- *      'AGNEGSA',
- *      'YTIRTSP',
- *   ];
- *   'ANGULAR'   => true   (first row)
- *   'REACT'     => true   (starting from the top-right R adn follow the ↓ ← ← ↓ )
- *   'UNDEFINED' => true
- *   'RED'       => true
- *   'STRING'    => true
- *   'CLASS'     => true
- *   'ARRAY'     => true   (first column)
- *   'FUNCTION'  => false
- *   'NULL'      => false
- */
-function findStringInSnakingPuzzle(puzzle, searchStr) {
-  throw new Error('Not implemented')
-}
-
 
 /**
  * Returns all permutations of the specified string.
@@ -78,7 +47,7 @@ function* getPermutations(input) {
  * Each day, you can either buy one unit of stock, sell any number of stock units you have already bought, or do nothing.
  * Therefore, the most profit is the maximum difference of all pairs in a sequence of stock prices.
  *
- * @param {array} quotes
+ * @param {number[]} quotes
  * @return {number} max profit
  *
  * @example
@@ -87,106 +56,23 @@ function* getPermutations(input) {
  *    [ 1, 6, 5, 10, 8, 7 ] => 18  (buy at 1,6,5 and sell all at 10)
  */
 function getMostProfitFromStockQuotes(quotes) {
-  throw new Error('Not implemented')
-}
+  const reverse = quotes.reverse()
+  let profit = 0
+  let min = 0
 
-
-/**
- * Class representing the url shorting helper.
- * Feel free to implement any algorithm, but do not store link in the key\value stores.
- * The short link can be at least 1.5 times shorter than the original url.
- *
- * @class
- *
- * @example
- *
- *     var urlShortener = new UrlShortener();
- *     var shortLink = urlShortener.encode('https://en.wikipedia.org/wiki/URL_shortening');
- *     var original  = urlShortener.decode(shortLink); // => 'https://en.wikipedia.org/wiki/URL_shortening'
- *
- */
-function UrlShortener() {
-  this.alphabet = '!#$&\'()*+,-./0123456789:;=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]_abcdefghijklmnopqrstuvwxyz~'.split('')
-  this.minCharCode = this.alphabet[0].charCodeAt(0)
-  this.maxCharCode = this.alphabet[this.alphabet.length - 1].charCodeAt(0)
-}
-
-UrlShortener.prototype = {
-  /**
-   * @param {string} url
-   * @param {number} round
-   */
-  encode: function(url, round) {
-    /**
-     * @var {number[]} result
-     */
-    const result = []
-
-    for (let i = 0; i < url.length; i++) {
-      const index = this.alphabet.findIndex(char => char === url.charAt(i))
-      const charCode = this.alphabet[index].charCodeAt(0)
-      const normalizedCharCode = charCode - this.minCharCode
-
-      if (!result.length) {
-        result.push(normalizedCharCode)
-        continue
-      }
-
-      const lastCharCode = result[result.length - 1]
-
-      if (result.length > 1 && normalizedCharCode + lastCharCode <= this.maxCharCode) {
-        result[result.length - 1] = normalizedCharCode + lastCharCode
-      } else {
-        result.push(normalizedCharCode)
-      }
+  for (const quote of reverse) {
+    if (min <= quote) {
+      min = quote
     }
 
-    console.log(result.map(v => String.fromCharCode(v)).join(''))
+    profit += min - quote
+  }
 
-    return result.map(v => String.fromCharCode(v)).join('')
-  },
-
-  /**
-   * @param {string} code
-   * @param {number} round
-   */
-  decode: function(code, round) {
-    const result = []
-
-    for (let i = 0; i < code.length; i++) {
-      const normalizedCharCode = code.charCodeAt(i)
-      const charCode = normalizedCharCode + this.minCharCode
-
-      if (!result.length) {
-        result.push(normalizedCharCode)
-        continue
-      }
-
-      let lastCharCode = result[result.length - 1]
-
-      while (normalizedCharCode + lastCharCode <= this.maxCharCode) {
-        result.push(lastCharCode - normalizedCharCode)
-
-        lastCharCode = lastCharCode + normalizedCharCode
-      }
-
-      if (normalizedCharCode + lastCharCode <= this.maxCharCode) {
-        result.push(lastCharCode - charCode)
-      } else {
-        result.push(charCode)
-      }
-    }
-
-    console.log(result.map(v => String.fromCharCode(v)).join(''))
-
-    throw new Error('Not implemented')
-  },
+  return profit
 }
 
 
 module.exports = {
-  findStringInSnakingPuzzle: findStringInSnakingPuzzle,
   getPermutations: getPermutations,
   getMostProfitFromStockQuotes: getMostProfitFromStockQuotes,
-  UrlShortener: UrlShortener,
 }
